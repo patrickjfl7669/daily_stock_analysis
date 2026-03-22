@@ -122,7 +122,7 @@ jobs:
           AI_MODE: "tw_band"
           AI_PROMPT: "使用繁體中文輸出，精簡分析台股穩健波段，重點看大盤趨勢、法人連買、量價結構、回踩均線、支撐壓力。不推短線、不當沖、不追高，明確給出進場區、停損區，文字量精簡以節省 API 額度。"
           MODEL: "gemini-flash"
-          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+         
           
           # ==========================================
           # Email 推送配置（核心修正：放在 env 區塊內）
