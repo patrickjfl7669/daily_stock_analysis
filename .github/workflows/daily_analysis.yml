@@ -94,7 +94,7 @@ jobs:
           # 搜索服务
           # ==========================================
           BOCHA_API_KEYS: ${{ secrets.BOCHA_API_KEYS }}
-          TAVILY_API_KEYS: ${{ secrets.TAVILY_API_KEYS }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
           SERPAPI_API_KEYS: ${{ secrets.SERPAPI_API_KEYS }}
           MINIMAX_API_KEYS: ${{ secrets.MINIMAX_API_KEYS }}
           BRAVE_API_KEYS: ${{ secrets.BRAVE_API_KEYS }}
@@ -253,7 +253,7 @@ jobs:
           echo ""
           echo "【搜索引擎】"
           echo "  Bocha API Keys: $([ -n "$BOCHA_API_KEYS" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
-          echo "  Tavily API Keys: $([ -n "$TAVILY_API_KEYS" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
+          echo "  Tavily API Keys: $([ -n "$TAVILY_API_KEY" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
           echo "  SerpAPI Keys: $([ -n "$SERPAPI_API_KEYS" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
           echo "  MiniMax API Keys: $([ -n "$MINIMAX_API_KEYS" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
           echo "  Brave API Keys: $([ -n "$BRAVE_API_KEYS" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
