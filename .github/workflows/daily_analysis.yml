@@ -68,7 +68,7 @@ jobs:
           LITELLM_MODEL: ${{ vars.LITELLM_MODEL || secrets.LITELLM_MODEL }}
 
           # Gemini AI（主选）
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.EMINI_API_KEY }}
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL || secrets.GEMINI_MODEL || 'gemini-3-flash-preview' }}
           GEMINI_MODEL_FALLBACK: ${{ vars.GEMINI_MODEL_FALLBACK || secrets.GEMINI_MODEL_FALLBACK || 'gemini-2.5-flash' }}
           GEMINI_REQUEST_DELAY: '3.0'
@@ -100,7 +100,52 @@ jobs:
           BRAVE_API_KEYS: ${{ secrets.BRAVE_API_KEYS }}
           SEARXNG_BASE_URLS: ${{ secrets.SEARXNG_BASE_URLS }}
           SEARXNG_PUBLIC_INSTANCES_ENABLED: ${{ vars.SEARXNG_PUBLIC_INSTANCES_ENABLED || secrets.SEARXNG_PUBLIC_INSTANCES_ENABLED }}
-          
+          # 台股波段 + Email 推送設定
+MARKET: tw
+DATA_SOURCE: yfinance,twse
+INDEX: ^TWII
+CURRENCY: TWD
+LANGUAGE: zh-TW
+MA_LIST: "5,10,20,60"
+MACD_FAST: 12
+MACD_SLOW: 26
+MACD_SIGNAL: 9
+KD_K: 9
+KD_D: 3
+VOLUME_ANALYSIS: "true"
+FOREIGN_INVESTOR: "true"
+TRUST_BUY: "true"
+AI_PROVIDER: gemini
+AI_MODE: "tw_band"
+AI_PROMPT: "使用繁體中文輸出，精簡分析台股穩健波段，重點看大盤趨勢、法人連買、量價結構、回踩均線、支撐壓力。不推短線、不當沖、不追高，明確給出進場區、停損區，文字量精簡以節省 API 額度。"
+MODEL: "gemini-flash"
+# 開啟 Email 推送
+EMAIL_NOTIFY: "true"
+DING_NOTIFY: "false"
+FEISHU_NOTIFY: "false"
+LINE_NOTIFY: "false"
+SMTP_SERVER: "smtp.gmail.com"
+SMTP_PORT: 587
+SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
+SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+TO_EMAIL: ${{ secrets.SMTP_EMAIL }}
+TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+AI_PROVIDER: gemini
+AI_MODE: "tw_band"
+AI_PROMPT: "使用繁體中文輸出，精簡分析台股穩健波段，重點看大盤趨勢、法人連買、量價結構、回踩均線、支撐壓力。不推短線、不當沖、不追高，明確給出進場區、停損區，文字量精簡以節省 API 額度。"
+MODEL: "gemini-flash"
+# 開啟 Email 推送，關閉其他
+EMAIL_NOTIFY: "true"
+DING_NOTIFY: "false"
+FEISHU_NOTIFY: "false"
+LINE_NOTIFY: "false"
+# Email 設定（Gmail）
+SMTP_SERVER: "smtp.gmail.com"
+SMTP_PORT: 587
+SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
+SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+TO_EMAIL: ${{ secrets.SMTP_EMAIL }}
+TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
           # ==========================================
           # 通知渠道（可同时配置多个，全部推送）
           # ==========================================
