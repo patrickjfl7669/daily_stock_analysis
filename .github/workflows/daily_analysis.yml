@@ -1,4 +1,4 @@
-name: Daily TW Stock Analysis
+name: Daily TW Stock Analysis (Fixed)
 
 on:
   schedule:
@@ -52,14 +52,24 @@ jobs:
       - name: Create Folders
         run: mkdir -p data logs reports
 
-      - name: Run Analysis
+      - name: Run Analysis (TW Market + API Enabled)
         env:
+          # 強制台股標的
           STOCK_LIST: "TWII,TF,2330"
           MARKET_REVIEW_REGION: "tw"
-          REPORT_LANGUAGE: zh-TW
+          REPORT_LANGUAGE: "zh-TW"
+          REPORT_TYPE: "full"
+          
+          # 強制啟用新聞抓取
           FETCH_TW_NEWS: "true"
           NEWS_SOURCES: "anue,yahoo_tw,cna,mops"
-
+          
+          # 強制啟用 AI 分析（請確保你的 Secrets 裡有這些 Key）
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ENABLE_AI_ANALYSIS: "true"
+          
+          # Gmail 發信
           EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           EMAIL_RECEIVERS: ${{ secrets.EMAIL_SENDER }}
@@ -87,4 +97,3 @@ jobs:
         with:
           name: reports
           path: reports/
-          
