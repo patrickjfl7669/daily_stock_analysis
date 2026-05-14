@@ -1,4 +1,4 @@
-name: Daily TW Stock Analysis (Ultimate Fix)
+name: Daily TW Stock Analysis (Final)
 
 on:
   schedule:
@@ -52,22 +52,11 @@ jobs:
       - name: Create Folders
         run: mkdir -p data logs reports
 
-      - name: Override Config & Run Analysis (TW Only)
+      - name: Run Analysis
         env:
-          # 強制覆蓋所有設定，優先級最高
-          FORCE_TW_MODE: "true"
-          STOCK_LIST: "TWII,TF,2330"
-          MARKET_REVIEW_REGION: "tw"
-          REPORT_LANGUAGE: "zh-TW"
-          FETCH_TW_NEWS: "true"
-          NEWS_SOURCES: "anue,yahoo_tw,cna,mops"
-          ENABLE_AI_ANALYSIS: "true"
-          
-          # API Key（請確保你的 Secrets 裡有這些）
+          # 確保 Secrets 正確傳入
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          
-          # Gmail 發信
           EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           EMAIL_RECEIVERS: ${{ secrets.EMAIL_SENDER }}
@@ -77,19 +66,7 @@ jobs:
           LOG_LEVEL: INFO
           MAX_WORKERS: 1
 
-        run: |
-          # 直接在執行前修改程式碼，強制覆蓋配置（確保一定生效）
-          echo "import os" > config_override.py
-          echo "os.environ['FORCE_TW_MODE'] = 'true'" >> config_override.py
-          echo "os.environ['STOCK_LIST'] = 'TWII,TF,2330'" >> config_override.py
-          echo "os.environ['MARKET_REVIEW_REGION'] = 'tw'" >> config_override.py
-          echo "os.environ['REPORT_LANGUAGE'] = 'zh-TW'" >> config_override.py
-          echo "os.environ['FETCH_TW_NEWS'] = 'true'" >> config_override.py
-          echo "os.environ['NEWS_SOURCES'] = 'anue,yahoo_tw,cna,mops'" >> config_override.py
-          echo "os.environ['ENABLE_AI_ANALYSIS'] = 'true'" >> config_override.py
-          
-          # 以強制覆蓋模式執行程式
-          python -c "import config_override; import main; main.main()"
+        run: python main.py
       
       - name: Keepalive
         if: github.event.schedule == '0 1 * * 0'
