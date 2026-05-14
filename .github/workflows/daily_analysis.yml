@@ -7,8 +7,8 @@ on:
 
   workflow_dispatch:
     inputs:
-      執行模式:
-        description: '選擇執行模式'
+      mode:
+        description: '執行模式'
         required: true
         default: 'full'
         type: choice
@@ -75,7 +75,7 @@ jobs:
           MAX_WORKERS: 1
 
         run: |
-          MODE="${{ github.event.inputs.執行模式 || 'full' }}"
+          MODE="${{ github.event.inputs.mode || 'full' }}"
           echo "=========================================="
           echo "📈 每日台股分析｜四大新聞來源"
           echo "來源：鉅亨網 + Yahoo財經 + 中央社 + MOPS"
