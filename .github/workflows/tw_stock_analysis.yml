@@ -2,24 +2,8 @@ name: Daily TW Stock Analysis
 
 on:
   schedule:
-    - cron: '0 0 * * 1-5'
-    - cron: '0 1 * * 0'
-
+    - cron: '0 10 * * 1-5'  # UTC10點 = 台灣時間18:00，平日執行
   workflow_dispatch:
-    inputs:
-      mode:
-        description: 'Execution Mode'
-        required: true
-        default: 'full'
-        type: choice
-        options:
-          - full
-          - market-only
-          - stocks-only
-
-concurrency:
-  group: stock-analysis
-  cancel-in-progress: false
 
 jobs:
   analyze:
@@ -29,61 +13,23 @@ jobs:
       contents: write
 
     steps:
-      - name: Random Delay
-        run: sleep $((RANDOM % 60))
-      
-      - name: Checkout Code
+      - name: 拉取程式碼
         uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
 
-      - name: Setup Python
-        uses: actions/setup-python@v6
+      - name: 設定Python環境
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'pip'
-      
-      - name: Install Dependencies
+          python-version: "3.11"
+
+      - name: 安裝依賴套件
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install requests beautifulsoup4 lxml
-      
-      - name: Create Folders
-        run: mkdir -p data logs reports
+          pip install yfinance requests python-dotenv
 
-      - name: Run Analysis
+      - name: 執行台股分析程式
         env:
-          STOCK_LIST: "TWII,TF,2330"
-          MARKET_REVIEW_REGION: "tw"
-          REPORT_LANGUAGE: zh-TW
-          FETCH_TW_NEWS: "true"
-          NEWS_SOURCES: "anue,yahoo_tw,cna,mops"
-
-          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
-          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-          EMAIL_RECEIVERS: ${{ secrets.EMAIL_SENDER }}
-          SMTP_HOST: smtp.gmail.com
-          SMTP_PORT: 465
-
-          LOG_LEVEL: INFO
-          MAX_WORKERS: 1
-
-        run: |
-          MODE="${{ github.event.inputs.mode || 'full' }}"
-          python main.py
-      
-      - name: Keepalive
-        if: github.event.schedule == '0 1 * * 0'
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git commit --allow-empty -m "Weekly keepalive"
-          git push
-      
-      - name: Upload Reports
-        uses: actions/upload-artifact@v6
-        if: always()
-        with:
-          name: reports
-          path: reports/
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          STOCK_LIST: ${{ secrets.STOCK_LIST }}
+          GMAIL_SENDER: ${{ secrets.GMAIL_SENDER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_RECEIVER: ${{ secrets.GMAIL_RECEIVER }}
+        run: python main.py
