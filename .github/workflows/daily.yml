@@ -1,0 +1,31 @@
+name: 台股每日自動分析
+
+on:
+  schedule:
+    - cron: '0 10 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  run-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取程式碼
+        uses: actions/checkout@v4
+
+      - name: 設定Python環境
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 安裝依賴套件
+        run: |
+          pip install yfinance requests python-dotenv
+
+      - name: 執行台股分析程式
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          STOCK_LIST: ${{ secrets.STOCK_LIST }}
+          GMAIL_SENDER: ${{ secrets.GMAIL_SENDER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_RECEIVER: ${{ secrets.GMAIL_RECEIVER }}
+        run: python main.py
