@@ -30,14 +30,14 @@ def get_tw_analysis(codes):
             report += f"{code} 資料取得失敗: {e}\n"
     return report
 
-# ===== 台股大盤新聞（RSS 穩定版）=====
+# ===== 台股大盤新聞（改用 Yahoo 財經 RSS）=====
 def get_market_news():
     print("DEBUG: 正在抓取台股大盤新聞...")
     news_report = "\n\n【今日台股大盤新聞快訊】\n"
     news_report += "============================\n"
     try:
-        # 鉅亨網台股 RSS
-        feed = feedparser.parse("https://news.cnyes.com/rss/cat/tw_stock.xml")
+        # 改用 Yahoo 財經台股 RSS，穩定度更高
+        feed = feedparser.parse("https://tw.news.yahoo.com/rss/finance/stock")
         if feed.entries:
             for idx, entry in enumerate(feed.entries[:3], 1):
                 title = entry.title
@@ -49,7 +49,7 @@ def get_market_news():
         news_report += f"新聞抓取失敗: {e}\n"
     return news_report
 
-# ===== 個股相關新聞（RSS 穩定版）=====
+# ===== 個股相關新聞（改用 Yahoo 財經搜尋 RSS）=====
 def get_stock_news(codes):
     print("DEBUG: 正在抓取個股專屬新聞...")
     news_report = "\n【你持有的個股相關新聞】\n"
@@ -57,15 +57,15 @@ def get_stock_news(codes):
     for code in codes:
         found = False
         try:
-            feed = feedparser.parse("https://news.cnyes.com/rss/cat/tw_stock.xml")
-            for entry in feed.entries:
-                if str(code) in entry.title or str(code) in entry.summary:
+            # 用 Yahoo 財經搜尋個股代碼的新聞
+            feed = feedparser.parse(f"https://tw.news.yahoo.com/rss/search?q={code}")
+            if feed.entries:
+                news_report += f"📌 {code} 相關新聞:\n"
+                for idx, entry in enumerate(feed.entries[:2], 1):
                     title = entry.title
                     link = entry.link
-                    news_report += f"📌 {code} 相關新聞:\n"
-                    news_report += f"  • {title}\n    連結: {link}\n\n"
-                    found = True
-                    break  # 每檔股票只顯示1則
+                    news_report += f"  {idx}. {title}\n     連結: {link}\n\n"
+                found = True
             if not found:
                 news_report += f"📌 {code} 今日無相關新聞\n\n"
         except Exception as e:
