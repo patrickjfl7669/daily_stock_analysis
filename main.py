@@ -30,14 +30,14 @@ def get_tw_analysis(codes):
             report += f"{code} 資料取得失敗: {e}\n"
     return report
 
-# ===== 台股大盤新聞（改用 Yahoo 財經 RSS）=====
+# ===== 台股大盤新聞（台灣證交所官方 RSS，永久穩定）=====
 def get_market_news():
     print("DEBUG: 正在抓取台股大盤新聞...")
     news_report = "\n\n【今日台股大盤新聞快訊】\n"
     news_report += "============================\n"
     try:
-        # 改用 Yahoo 財經台股 RSS，穩定度更高
-        feed = feedparser.parse("https://tw.news.yahoo.com/rss/finance/stock")
+        # 台灣證交所公開資訊觀測站 RSS，路徑永久有效
+        feed = feedparser.parse("https://mops.twse.com.tw/mops/web/xml/rss/news.xml")
         if feed.entries:
             for idx, entry in enumerate(feed.entries[:3], 1):
                 title = entry.title
@@ -49,7 +49,7 @@ def get_market_news():
         news_report += f"新聞抓取失敗: {e}\n"
     return news_report
 
-# ===== 個股相關新聞（改用 Yahoo 財經搜尋 RSS）=====
+# ===== 個股相關新聞（鉅亨網搜尋 RSS，穩定匹配）=====
 def get_stock_news(codes):
     print("DEBUG: 正在抓取個股專屬新聞...")
     news_report = "\n【你持有的個股相關新聞】\n"
@@ -57,8 +57,8 @@ def get_stock_news(codes):
     for code in codes:
         found = False
         try:
-            # 用 Yahoo 財經搜尋個股代碼的新聞
-            feed = feedparser.parse(f"https://tw.news.yahoo.com/rss/search?q={code}")
+            # 鉅亨網個股搜尋 RSS
+            feed = feedparser.parse(f"https://news.cnyes.com/rss/search?q={code}")
             if feed.entries:
                 news_report += f"📌 {code} 相關新聞:\n"
                 for idx, entry in enumerate(feed.entries[:2], 1):
