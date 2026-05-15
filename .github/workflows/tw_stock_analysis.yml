@@ -23,7 +23,7 @@ jobs:
 
       - name: 安裝依賴套件
         run: |
-          pip install yfinance requests python-dotenv
+          pip install yfinance requests python-dotenv beautifulsoup4
 
       - name: 執行台股分析程式
         env:
