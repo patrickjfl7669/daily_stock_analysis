@@ -3,9 +3,7 @@ import yfinance as yf
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import requests
-from bs4 import BeautifulSoup
-import time
+import feedparser
 
 # ===== 台股技術分析 =====
 def get_tw_analysis(codes):
@@ -32,50 +30,46 @@ def get_tw_analysis(codes):
             report += f"{code} 資料取得失敗: {e}\n"
     return report
 
-# ===== 通用新聞請求函數（避免重複程式碼）=====
-def fetch_news(url, description):
-    news = []
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
-    try:
-        response = requests.get(url, headers=headers, timeout=10)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, "html.parser")
-        news_items = soup.select("div._1E4L a")[:3]
-        for item in news_items:
-            title = item.get("title", "無標題")
-            link = "https://news.cnyes.com" + item.get("href", "")
-            news.append((title, link))
-    except Exception as e:
-        print(f"DEBUG: {description} 新聞抓取失敗: {e}")
-    return news
-
-# ===== 台股大盤新聞 =====
+# ===== 台股大盤新聞（RSS 穩定版）=====
 def get_market_news():
     print("DEBUG: 正在抓取台股大盤新聞...")
     news_report = "\n\n【今日台股大盤新聞快訊】\n"
     news_report += "============================\n"
-    news_list = fetch_news("https://news.cnyes.com/news/cat/tw_stock", "大盤")
-    for idx, (title, link) in enumerate(news_list, 1):
-        news_report += f"{idx}. {title}\n  連結: {link}\n\n"
+    try:
+        # 鉅亨網台股 RSS
+        feed = feedparser.parse("https://news.cnyes.com/rss/cat/tw_stock.xml")
+        if feed.entries:
+            for idx, entry in enumerate(feed.entries[:3], 1):
+                title = entry.title
+                link = entry.link
+                news_report += f"{idx}. {title}\n  連結: {link}\n\n"
+        else:
+            news_report += "目前無新聞可顯示\n"
+    except Exception as e:
+        news_report += f"新聞抓取失敗: {e}\n"
     return news_report
 
-# ===== 個股專屬新聞 =====
+# ===== 個股相關新聞（RSS 穩定版）=====
 def get_stock_news(codes):
     print("DEBUG: 正在抓取個股專屬新聞...")
     news_report = "\n【你持有的個股相關新聞】\n"
     news_report += "============================\n"
     for code in codes:
-        news_list = fetch_news(f"https://news.cnyes.com/news/search?q={code}", f"{code}")
-        if news_list:
-            news_report += f"📌 {code} 相關新聞:\n"
-            for idx, (title, link) in enumerate(news_list, 1):
-                news_report += f"  {idx}. {title}\n     連結: {link}\n"
-            news_report += "\n"
-        else:
-            news_report += f"📌 {code} 今日無相關新聞\n\n"
-        time.sleep(1)  # 加入延遲避免被擋
+        found = False
+        try:
+            feed = feedparser.parse("https://news.cnyes.com/rss/cat/tw_stock.xml")
+            for entry in feed.entries:
+                if str(code) in entry.title or str(code) in entry.summary:
+                    title = entry.title
+                    link = entry.link
+                    news_report += f"📌 {code} 相關新聞:\n"
+                    news_report += f"  • {title}\n    連結: {link}\n\n"
+                    found = True
+                    break  # 每檔股票只顯示1則
+            if not found:
+                news_report += f"📌 {code} 今日無相關新聞\n\n"
+        except Exception as e:
+            news_report += f"📌 {code} 新聞抓取失敗: {e}\n\n"
     return news_report
 
 # ===== Gmail 寄信 =====
